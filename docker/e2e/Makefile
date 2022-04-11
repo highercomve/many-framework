@@ -52,7 +52,6 @@ genfiles/node%: tendermint-docker openssl-docker
 	mkdir -p "$@/persistent-ledger"
 	cp ledger_state.json $@/ledger_state.json
 
-
 generate-e2e-config:
 	I=0; while [[ $$I -lt ${NB_NODES} ]]; do \
 		echo $$I genfiles/node$$I; \
@@ -61,8 +60,7 @@ generate-e2e-config:
 	done
 	sh update_config.sh -c "genfiles/node%/tendermint/config" -i tendermint-% $(NB_NODES)
 
-.PHONY: start-all-nodes stop-node
-start-all-nodes:
+start-docker-compose: build-abci build-ledger generate-e2e-config genfiles/docker-compose.json
 	docker-compose -f genfiles/docker-compose.json -p e2e up
 
 stop-node:
