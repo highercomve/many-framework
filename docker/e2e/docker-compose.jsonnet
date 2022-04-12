@@ -7,7 +7,7 @@ local abci(i, user) = {
     user: "" + user,
     command: [
         "--many", "0.0.0.0:8000",
-        "--many-app", "http://ledger-" + i + ":8000",
+        "--many-app", "http://ledger-" + i + ":9000",
         "--many-pem", "/genfiles/abci.pem",
         "--abci", "0.0.0.0:26658",
         "--tendermint", "http://tendermint-" + i + ":26657/"
@@ -24,7 +24,7 @@ local ledger(i, user) = {
     ],
     command: [
         "--abci",
-        "--addr", "0.0.0.0:8000",
+        "--addr", "0.0.0.0:9000",
         "--state", "/genfiles/ledger_state.json",
         "--persistent", "/persistent/ledger.db",
         "--pem", "/genfiles/ledger.pem",

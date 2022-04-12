@@ -1,4 +1,3 @@
-
 .PHONY: clean
 clean:
 	if [ -f "${PWD}/genfiles/docker-compose.json" ]; then \
@@ -14,14 +13,17 @@ clean-tm-data:
 .PHONY: build
 build: build-repo build-ledger
 
+NB_NODES ?= 4
+DOCKER_PLATFORM ?= 
+
 build-repo:
-	docker build --ssh default --tag many_local/repo_build ../.. --target builder -f ../build.dockerfile
+	docker buildx build --load $(DOCKER_PLATFORM) --ssh default --tag many_local/repo_build ../.. --target builder -f ../build.dockerfile
 
 build-ledger: build-repo
-	docker build --build-arg USER_ID=$$(id -u) --ssh default --tag many/ledger ../.. --target runtime -f ../ledger/Dockerfile
+	docker buildx build --load $(DOCKER_PLATFORM) --build-arg USER_ID=$$(id -u) --ssh default --tag many/ledger ../.. --target runtime -f ../ledger/Dockerfile
 
 build-abci: build-repo
-	docker build --build-arg USER_ID=$$(id -u) --ssh default --tag many/abci ../.. --target runtime -f ../abci/Dockerfile
+	docker buildx build --load $(DOCKER_PLATFORM) --build-arg USER_ID=$$(id -u) --ssh default --tag many/abci ../.. --target runtime -f ../abci/Dockerfile
 
 .PHONY: start-ledger-local
 start-ledger-local: build-ledger
@@ -38,8 +40,6 @@ openssl-docker:
 jsonnet-docker:
 	docker pull bitnami/jsonnet
 
-NB_NODES ?= 4
-
 genfiles/docker-compose.json: jsonnet-docker
 	docker run -it --rm -v "${PWD}:/volume:ro" bitnami/jsonnet \
 		/volume/docker-compose.jsonnet --tla-code nb_nodes=$(NB_NODES) --tla-code user=$$(id -u) > $@
@@ -53,12 +53,13 @@ genfiles/node%: tendermint-docker openssl-docker
 	cp ledger_state.json $@/ledger_state.json
 
 generate-e2e-config:
+	echo "Generation files for node: "; \
 	I=0; while [[ $$I -lt ${NB_NODES} ]]; do \
 		echo $$I genfiles/node$$I; \
 		make genfiles/node$$I; \
 		(( I = I + 1 )); \
 	done
-	sh update_config.sh -c "genfiles/node%/tendermint/config" -i tendermint-% $(NB_NODES)
+	./update_config.sh -c "genfiles/node%/tendermint/config" -i tendermint-% $(NB_NODES)
 
 start-docker-compose: build-abci build-ledger generate-e2e-config genfiles/docker-compose.json
 	docker-compose -f genfiles/docker-compose.json -p e2e up
@@ -70,3 +71,7 @@ start-docker-compose: build-abci build-ledger generate-e2e-config genfiles/docke
 
 chaos: 
 	sh chaos.sh 
+
+pvr-devices: SHELL:=/bin/bash 
+pvr-devices: build-abci build-ledger generate-e2e-config genfiles/docker-compose.json
+	./create_pvr_device.sh $(NB_NODES)
