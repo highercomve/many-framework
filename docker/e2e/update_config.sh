@@ -108,7 +108,7 @@ done
 
 # Same genesis data for all.
 genesis_temp_file=$(mktemp)
-jq ".validators = ${all_validators} | .chain_id = \"many-e2e-ledger\"" "${config_root//%/1}/genesis.json" > "$genesis_temp_file"
+jq ".validators = ${all_validators} | .chain_id = \"many-e2e-ledger\"" "${config_root//%/0}/genesis.json" > "$genesis_temp_file"
 for node in $(seq 0 "$NB_NODES"); do
   cp "$genesis_temp_file" "${config_root//%/$node}/genesis.json"
 done
