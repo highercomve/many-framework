@@ -17,13 +17,13 @@ NB_NODES ?= 4
 DOCKER_PLATFORM ?= 
 
 build-repo:
-	docker buildx build --load $(DOCKER_PLATFORM) --ssh default --tag many_local/repo_build ../.. --target builder -f ../build.dockerfile
+	docker build $(DOCKER_PLATFORM) --ssh default --tag many_local/repo_build ../.. --target builder -f ../build.dockerfile
 
 build-ledger: build-repo
-	docker buildx build --load $(DOCKER_PLATFORM) --build-arg USER_ID=$$(id -u) --ssh default --tag many/ledger ../.. --target runtime -f ../ledger/Dockerfile
+	docker build $(DOCKER_PLATFORM) --build-arg USER_ID=$$(id -u) --ssh default --tag many/ledger ../.. --target runtime -f ../ledger/Dockerfile
 
 build-abci: build-repo
-	docker buildx build --load $(DOCKER_PLATFORM) --build-arg USER_ID=$$(id -u) --ssh default --tag many/abci ../.. --target runtime -f ../abci/Dockerfile
+	docker build $(DOCKER_PLATFORM) --build-arg USER_ID=$$(id -u) --ssh default --tag many/abci ../.. --target runtime -f ../abci/Dockerfile
 
 .PHONY: start-ledger-local
 start-ledger-local: build-ledger
