@@ -33,6 +33,16 @@ local ledger(i, user) = {
 
 local tendermint(i, user, tendermint_tag="v0.35.1") = {
     image: "tendermint/tendermint:" + tendermint_tag,
+    environment: [
+        "PATH=/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "GOLANG_VERSION=1.15.15",
+        "GOPATH=/go",
+        "TMHOME=/tendermint_home",
+        "PROXY_APP=kvstore",
+        "MONIKER=dockernode",
+        "CHAIN_ID=dockerchain",
+        "TENDERMINT_HOME=/tendermint_home"
+    ],
     command: [
         "--log-level", "info",
         "start",

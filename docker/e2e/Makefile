@@ -52,6 +52,7 @@ genfiles/node%: tendermint-docker openssl-docker
 	mkdir -p "$@/persistent-ledger"
 	cp ledger_state.json $@/ledger_state.json
 
+generate-e2e-config: SHELL:=/bin/bash 
 generate-e2e-config:
 	echo "Generation files for node: "; \
 	I=0; while [[ $$I -lt ${NB_NODES} ]]; do \
