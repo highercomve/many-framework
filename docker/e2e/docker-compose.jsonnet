@@ -37,11 +37,11 @@ local tendermint(i, user, tendermint_tag="v0.35.1") = {
         "PATH=/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
         "GOLANG_VERSION=1.15.15",
         "GOPATH=/go",
-        "TMHOME=/tendermint_home",
+        "TMHOME=/tendermint",
         "PROXY_APP=kvstore",
         "MONIKER=dockernode",
         "CHAIN_ID=dockerchain",
-        "TENDERMINT_HOME=/tendermint_home"
+        "TENDERMINT_HOME=/tendermint"
     ],
     command: [
         "--log-level", "info",
